@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FillBot</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <span class="logo">⚡ FillBot</span>
+      <span class="tagline">AI Job Autofill</span>
+    </header>
+
+    <section id="setup-section">
+      <label class="field-label">Gemini API Key
+        <input type="password" id="api-key-input" placeholder="AIza..." />
+      </label>
+      <button id="save-key-btn" class="btn btn-secondary">Save Key</button>
+      <span id="key-status" class="status-text"></span>
+    </section>
+
+    <hr />
+
+    <section id="cv-section">
+      <label class="field-label">Your CV / Context
+        <textarea id="cv-input" rows="6" placeholder="Paste your CV here (name, skills, experience, education)..."></textarea>
+      </label>
+      <button id="save-cv-btn" class="btn btn-secondary">Save CV</button>
+      <span id="cv-status" class="status-text"></span>
+    </section>
+
+    <hr />
+
+    <section id="action-section">
+      <button id="fill-btn" class="btn btn-primary" disabled>
+        <span id="fill-btn-text">⚡ Fill This Page</span>
+      </button>
+      <button id="open-panel-btn" class="btn btn-ghost">Review in Side Panel →</button>
+      <div id="fill-status" class="fill-status"></div>
+    </section>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

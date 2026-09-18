@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FillBot — Review</title>
+  <link rel="stylesheet" href="sidepanel.css" />
+</head>
+<body>
+  <header>
+    <span class="logo">⚡ FillBot</span>
+    <span class="tagline">Review Answers</span>
+  </header>
+
+  <div id="no-answers" class="empty-state">
+    <p>Use the popup → "Fill This Page" to generate answers, then they will appear here for review.</p>
+  </div>
+
+  <div id="answers-container" class="answers-container" style="display:none;">
+    <div class="toolbar">
+      <button id="apply-all-btn" class="btn btn-primary">✓ Apply All</button>
+      <button id="clear-btn" class="btn btn-ghost">✗ Clear</button>
+    </div>
+    <div id="fields-list"></div>
+  </div>
+
+  <script src="sidepanel.js"></script>
+</body>
+</html>

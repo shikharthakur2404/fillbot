@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "FillBot — AI Job Autofill",
+  "version": "1.0.0",
+  "description": "Fills job application forms using your CV and Gemini AI. 100% local — your data never leaves your browser.",
+  "permissions": ["storage", "scripting", "tabs", "sidePanel", "activeTab"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "FillBot"
+  },
+  "side_panel": {
+    "default_path": "sidepanel/sidepanel.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
