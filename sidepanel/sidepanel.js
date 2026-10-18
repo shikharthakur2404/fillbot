@@ -106,21 +106,38 @@ function updateCharCount(el, length, limit) {
   }
 }
 
-async function ensureContentScript(tabId) {
-  // Inject on user gesture (activeTab). Do not declare <all_urls> content_scripts.
+async function ensureContentScript(tab) {
+  // Prefer activeTab (granted when the user opens the extension).
+  // Fall back to optional_host_permissions for this origin only.
   try {
     await chrome.scripting.executeScript({
-      target: { tabId },
+      target: { tabId: tab.id },
       files: ['content/content.js'],
     });
+    return true;
   } catch (_) {
-    // Restricted pages (chrome://, Web Store) cannot be scripted.
+    if (!tab.url || (!tab.url.startsWith('http://') && !tab.url.startsWith('https://'))) {
+      return false;
+    }
+    try {
+      const originPattern = new URL(tab.url).origin + '/*';
+      const granted = await chrome.permissions.request({ origins: [originPattern] });
+      if (!granted) return false;
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ['content/content.js'],
+      });
+      return true;
+    } catch (__ ) {
+      return false;
+    }
   }
 }
 
 async function applyToPage(answers) {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  await ensureContentScript(tab.id);
+  if (!tab?.id) return;
+  await ensureContentScript(tab);
   return new Promise((resolve) => {
     chrome.tabs.sendMessage(tab.id, { type: 'FILL_FIELDS', answers }, resolve);
   });
@@ -136,8 +153,10 @@ applyAllBtn.addEventListener('click', async () => {
 clearBtn.addEventListener('click', async () => {
   await chrome.storage.session.remove(['pendingAnswers', 'pendingFields']);
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  await ensureContentScript(tab.id);
-  chrome.tabs.sendMessage(tab.id, { type: 'CLEAR_HIGHLIGHTS' });
+  if (tab?.id) {
+    await ensureContentScript(tab);
+    chrome.tabs.sendMessage(tab.id, { type: 'CLEAR_HIGHLIGHTS' });
+  }
   fieldsList.innerHTML = '';
   answersContainer.style.display = 'none';
   noAnswers.style.display = 'flex';

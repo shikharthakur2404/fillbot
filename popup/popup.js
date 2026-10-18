@@ -111,15 +111,28 @@ fillBtn.addEventListener('click', async () => {
   // Get the currently active tab
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-  // Try to inject content.js again — it may not have run on restricted pages
-  // or pages that loaded before the extension was installed. Errors are safe to ignore.
+  // Inject on demand via activeTab; if that fails, request optional host
+  // access for this origin only (no standing <all_urls>).
   try {
     await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       files: ['content/content.js']
     });
   } catch (_) {
-    // Already injected — ignore the error
+    try {
+      if (tab.url && (tab.url.startsWith('http://') || tab.url.startsWith('https://'))) {
+        const originPattern = new URL(tab.url).origin + '/*';
+        const granted = await chrome.permissions.request({ origins: [originPattern] });
+        if (granted) {
+          await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ['content/content.js']
+          });
+        }
+      }
+    } catch (__ ) {
+      // Restricted pages (chrome://, Web Store) cannot be scripted.
+    }
   }
 
   // Step 1: Ask content.js to scan the page for form fields
