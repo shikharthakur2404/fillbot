@@ -106,8 +106,21 @@ function updateCharCount(el, length, limit) {
   }
 }
 
+async function ensureContentScript(tabId) {
+  // Inject on user gesture (activeTab). Do not declare <all_urls> content_scripts.
+  try {
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      files: ['content/content.js'],
+    });
+  } catch (_) {
+    // Restricted pages (chrome://, Web Store) cannot be scripted.
+  }
+}
+
 async function applyToPage(answers) {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  await ensureContentScript(tab.id);
   return new Promise((resolve) => {
     chrome.tabs.sendMessage(tab.id, { type: 'FILL_FIELDS', answers }, resolve);
   });
@@ -123,6 +136,7 @@ applyAllBtn.addEventListener('click', async () => {
 clearBtn.addEventListener('click', async () => {
   await chrome.storage.session.remove(['pendingAnswers', 'pendingFields']);
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  await ensureContentScript(tab.id);
   chrome.tabs.sendMessage(tab.id, { type: 'CLEAR_HIGHLIGHTS' });
   fieldsList.innerHTML = '';
   answersContainer.style.display = 'none';
