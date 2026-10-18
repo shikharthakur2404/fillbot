@@ -46,3 +46,9 @@ Private Chrome/Edge extension that uses your CV + Gemini AI to intelligently fil
 ## Privacy
 
 Your CV and API key are stored only in `chrome.storage.local` on your device. They are never synced or sent to any server. The only external call is your browser → Gemini API directly, using your own key.
+
+---
+
+Copyright © 2026 Shikhar Thakur.
+
+Released under the MIT License — see [LICENSE](LICENSE).
